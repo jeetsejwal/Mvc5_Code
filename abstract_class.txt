@@ -1,0 +1,80 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CSharpInterview
+{
+    public abstract class AbstractClass
+    {
+
+        public int ID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string GetFullName()
+        {
+            return this.FirstName + " " + LastName;
+        }
+        public abstract int GetMonthlySal();
+        
+    }
+    public class FullTimeEmp:AbstractClass
+    {
+        public int AnnualSalary { get; set; }
+               
+        public override int GetMonthlySal()
+        {
+           // return this.Hourlypay * this.TotalHour;
+            return this.AnnualSalary / 12;
+        }
+
+
+    }
+    public class CntractEmp:AbstractClass
+    {
+        public int Hourlypay { get; set; }
+        public int TotalHour { get; set; }
+
+        
+        public override int GetMonthlySal()
+        {
+            return this.Hourlypay * this.TotalHour;
+        }
+
+
+    }
+}
+
+
+
+class Program
+    {
+        static void Main(string[] args)
+        {
+
+            Console.WriteLine("==============================");
+            FullTimeEmp emp = new FullTimeEmp()
+            {
+                ID = 101,
+                FirstName="jeet",
+                LastName="sejwal",
+                AnnualSalary=12000
+            };
+            Console.WriteLine(emp.GetFullName());
+            Console.WriteLine(emp.GetMonthlySal());
+            Console.WriteLine("==============================");
+            CntractEmp obj = new CntractEmp()
+            {
+                ID = 101,
+                FirstName = "jeet",
+                LastName = "sejwal",
+                Hourlypay=500,
+                TotalHour=8
+            };
+            Console.WriteLine(obj.GetFullName());
+            Console.WriteLine(obj.GetMonthlySal());
+            Console.ReadLine();
+        }
+    }
+}

@@ -1,0 +1,26 @@
+  public ActionResult Sp_account()
+        {
+            bool Isactive=true;
+
+            var res = db.sp_UserAccountList(Isactive).ToList();
+            ViewBag.result = res;
+            return View();
+        }
+        [HttpPost]
+        public ActionResult LoginForm(string email, string pass)
+        {
+            var res = db.usp_UserLogin(email, pass);
+
+            if (Convert.ToBoolean(res)==true)
+            {
+                ViewBag.msg = "Login Sucessfully........";
+            }
+            else
+            {
+                ViewBag.msg = "Incorrect Details........";
+            }
+            ViewBag.result = res;
+            return RedirectToAction("SaveData");
+        }
+    }
+}

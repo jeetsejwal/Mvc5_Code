@@ -1,0 +1,919 @@
+ public IEnumerable<ViewModel.usp_WorkExperienceVM> ExpGetAll()
+            {
+                //IEnumerable<ViewModel.usp_WorkExperienceVM> Result = (IEnumerable<ViewModel.usp_WorkExperienceVM>)_context.usp_WorkExperience().AsEnumerable();
+                var result = _context.Database.SqlQuery<usp_WorkExperienceVM>("usp_WorkExperience").AsEnumerable();
+
+                return result;
+            }
+
+
+        public void ExpGetAll(usp_WorkExperienceVM Modelss)
+        {
+            try
+            {
+                using (var db = _context)
+                {
+                   // var x = db.testy().FirstOrDefault().hello;
+                   
+                    _context.usp_WorkInsert(Modelss.Company, Modelss.Country, Modelss.Title, Modelss.ToYear, Modelss.FromYear, Modelss.Description, Modelss.IdPers);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+
+        }
+
+
+        public void ExpGetUpdate(usp_WorkExperienceVM Modelss)
+        {
+            try
+            {
+                using (var db = _context)
+                {
+                    db.usp_WorkUpdate(Modelss.IDExp, Modelss.Company, Modelss.Country, Modelss.Title, Modelss.ToYear, Modelss.FromYear, Modelss.Description, Modelss.IdPers);
+                    db.Entry(Modelss).State = System.Data.Entity.EntityState.Modified;
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+        }
+
+
+        public usp_WorkExperienceVM ExpGetDetails(int id)
+        {
+            var result = _context.Database.SqlQuery<usp_WorkExperienceVM>("usp_WorkDetails @id").Where(x => x.IDExp == id).SingleOrDefault();
+
+                    return result ;
+                
+            
+
+        }
+//================================================
+ private Resume _Ires = new Resume();
+
+        //public ResumeCVController(): this(new Resume())
+        //{
+
+        //}
+        //public ResumeCVController(IResume repository)
+        //{
+        //    _repository = repository;
+        //}
+        //========================================================     
+        // GET: ResumeCV
+        public ActionResult Index()
+        {
+            IEnumerable<usp_WorkExperienceVM> Result = _Ires.ExpGetAll();
+            return View(Result);
+        }
+
+        public ActionResult ADDWorkSP()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ADDWorkSP(usp_WorkExperienceVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                if (vm!=null)
+                {
+                    _Ires.ExpGetAll(vm);
+                    ViewBag.msg = "Added Successfully................";
+
+                    return RedirectToAction("Index");
+                  
+                }
+                else
+                {
+                    ViewBag.msg = "Error in code............";
+
+                }
+            }
+            return View();
+        }
+
+        public ActionResult ExpGetUpdate(int id)
+        {
+            DBCVEntities db= new DBCVEntities();
+            WorkExperience result = db.WorkExperiences.Find(id);
+             //var result =_Ires.ExpGetDetails(id);
+            return View(result);
+        }
+        [HttpPost]
+        public ActionResult ExpGetUpdate(usp_WorkExperienceVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                if (vm != null)
+                {
+                    _Ires.ExpGetUpdate(vm);
+                    ViewBag.msg = "Update Successfully................";
+
+                    return RedirectToAction("Index");
+
+                }
+                else
+                {
+                    ViewBag.msg = "Error in code............";
+
+                }
+            }
+            return View(vm);
+        }
+        
+       //==================================================
+
+using ResumeReg.DAL;
+using ResumeReg.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+
+namespace ResumeReg.Repository
+{
+    interface IResume
+    {
+        Person AddPersonnalInformation(Person person, HttpPostedFileBase file);
+        string AddOrUpdateEducation(Education education, int idPer);
+        string AddOrUpdateExperience(WorkExperience workExperience, int idPer);
+        bool AddSkill(Skill skill, int idPer);
+        bool AddCertification(Certification certification, int idPer);
+        bool AddLanguage(Language language, int idPer);
+        //==============================================================
+        int GetIdPerson(string firstName, string lastName);
+        Person GetPersonnalInfo(int idPer);
+        IQueryable<Education> GetEducationById(int idPer);
+        IQueryable<WorkExperience> GetWorkExperienceById(int idPer);
+        IQueryable<Skill> GetSkillsById(int idPer);
+        IQueryable<Certification> GetCertificationsById(int idPer);
+        IQueryable<Language> GetLanguageById(int idPer);
+
+
+        //===================sp practice=========================
+        IEnumerable<usp_WorkExperienceVM> ExpGetAll();
+        void ExpGetAll(usp_WorkExperienceVM Modelss);
+        void ExpGetUpdate(usp_WorkExperienceVM Modelss);
+        usp_WorkExperienceVM ExpGetDetails(int id);
+
+
+    }
+}
+
+//====================================================
+using ResumeReg.DAL;
+using ResumeReg.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Validation;
+using System.Linq;
+using System.Web;
+
+namespace ResumeReg.Repository
+{
+    public class Resume :IResume
+    {
+        private readonly DBCVEntities _context;
+        public Resume()
+        {
+            _context = new DBCVEntities();
+        }
+
+        public Resume(DBCVEntities db)
+        {
+            _context = db;
+        }
+        //================================================================================
+        public Person AddPersonnalInformation(DAL.Person person, HttpPostedFileBase file)
+        {
+            try
+            {
+                
+                    var  result=_context.People.Add(person);
+                    _context.SaveChanges();
+                
+                
+               // bool result = _context.People.Add(person);
+                return result;
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+        }
+
+        //=============================================================================================
+
+
+        public string AddOrUpdateEducation(Education education, int idPer)
+        {
+            string msg = string.Empty;
+            Person personEntity = _context.People.Find(idPer);
+            if (personEntity != null)
+            {
+
+
+                if (education.IDEdu > 0)
+                {
+                    //we will update education entity
+                    _context.Entry(education).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                    msg = "Education entity has been updated successfully";
+                }
+                else
+                {
+                    // we will add new education entity
+                    personEntity.Educations.Add(education);
+                    _context.SaveChanges();
+
+                    msg = "Education entity has been Added successfully";
+                }
+
+            }
+            return msg;
+        }
+
+        //===============================================================================
+        public string AddOrUpdateExperience(WorkExperience workExperience, int idPer)
+        {
+            string msg = string.Empty;
+
+            Person personEntity = _context.People.Find(idPer);
+
+            if (personEntity != null)
+            {
+                if (workExperience.IDExp > 0)
+                {
+                    //we will update work experience entity
+                    _context.Entry(workExperience).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                    msg = "Work Experience entity has been updated successfully";
+                }
+                else
+                {
+                    // we will add new work experience entity
+                    personEntity.WorkExperiences.Add(workExperience);
+                    _context.SaveChanges();
+
+                    msg = "Work Experience entity has been Added successfully";
+                }
+            }
+
+            return msg;
+        }
+
+
+        //================================================================================================
+
+
+        public bool AddSkill(Skill skill, int idPer)
+        {
+            int countRecords = 0;
+            Person personEntity = _context.People.Find(idPer);
+
+            if (personEntity != null && skill != null)
+            {
+                personEntity.Skills.Add(skill);
+                countRecords = _context.SaveChanges();
+            }
+
+            return countRecords > 0 ? true : false;
+        }
+
+
+        public bool AddCertification(Certification certification, int idPer)
+        {
+            try
+            {
+                int countRecords = 0;
+                Person personEntity = _context.People.Find(idPer);
+
+                if (personEntity != null && certification != null)
+                {
+                    personEntity.Certifications.Add(certification);
+                    countRecords = _context.SaveChanges();
+                }
+
+                return countRecords > 0 ? true : false;
+            }
+            catch (DbEntityValidationException ex)
+            {
+
+                throw;
+            }
+
+        }
+
+
+        public bool AddLanguage(Language language, int idPer)
+        {
+            int countRecords = 0;
+            Person personEntity = _context.People.Find(idPer);
+
+            if (personEntity != null && language != null)
+            {
+                personEntity.Languages.Add(language);
+                countRecords = _context.SaveChanges();
+            }
+
+            return countRecords > 0 ? true : false;
+        }
+//===============================Store Procedure Crud Operation=======================================================================
+
+        
+        public IEnumerable<ViewModel.usp_WorkExperienceVM> ExpGetAll()
+            {
+                //IEnumerable<ViewModel.usp_WorkExperienceVM> Result = (IEnumerable<ViewModel.usp_WorkExperienceVM>)_context.usp_WorkExperience().AsEnumerable();
+                var result = _context.Database.SqlQuery<usp_WorkExperienceVM>("usp_WorkExperience").AsEnumerable();
+
+                return result;
+            }
+
+
+        public void ExpGetAll(usp_WorkExperienceVM Modelss)
+        {
+            try
+            {
+                using (var db = _context)
+                {
+                   // var x = db.testy().FirstOrDefault().hello;
+                   
+                    _context.usp_WorkInsert(Modelss.Company, Modelss.Country, Modelss.Title, Modelss.ToYear, Modelss.FromYear, Modelss.Description, Modelss.IdPers);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+
+        }
+
+
+        public void ExpGetUpdate(usp_WorkExperienceVM Modelss)
+        {
+            try
+            {
+                using (var db = _context)
+                {
+                    db.usp_WorkUpdate(Modelss.IDExp, Modelss.Company, Modelss.Country, Modelss.Title, Modelss.ToYear, Modelss.FromYear, Modelss.Description, Modelss.IdPers);
+                    db.Entry(Modelss).State = System.Data.Entity.EntityState.Modified;
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
+        }
+
+
+        public usp_WorkExperienceVM ExpGetDetails(int id)
+        {
+            var result = _context.Database.SqlQuery<usp_WorkExperienceVM>("usp_WorkDetails @id").Where(x => x.IDExp == id).SingleOrDefault();
+
+                    return result ;
+                
+            
+
+        }
+//======================================================================================================
+
+        public int GetIdPerson(string firstName, string lastName)
+        {
+            int idSelected = _context.People.Where(p => p.FirstName.ToLower().Equals(firstName.ToLower()))
+                                                          .Where(p => p.LastName.ToLower().Equals(lastName.ToLower()))
+                                                          .Select(p => p.IDPers).FirstOrDefault();
+
+            return idSelected;
+        }
+
+        public Person GetPersonnalInfo(int idPer)
+        {
+            return _context.People.Find(idPer);
+        }
+
+        public IQueryable<Education> GetEducationById(int idPer)
+        {
+
+            var certificationList = _context.Educations.Where(w => w.IDEdu == idPer);
+            return certificationList;
+        }
+
+        public IQueryable<WorkExperience> GetWorkExperienceById(int idPer)
+        {
+
+            var certificationList = _context.WorkExperiences.Where(w => w.IDExp == idPer);
+            return certificationList;
+        }
+
+        public IQueryable<Skill> GetSkillsById(int idPer)
+        {
+
+            var certificationList = _context.Skills.Where(w => w.IDSki == idPer);
+            return certificationList;
+        }
+
+        public IQueryable<Certification> GetCertificationsById(int idPer)
+        {
+            var certificationList = _context.Certifications.Where(w => w.IdPers == idPer);
+            return certificationList;
+        }
+
+        public IQueryable<Language> GetLanguageById(int idPer)
+        {
+            var certificationList = _context.Languages.Where(w => w.IDLang == idPer);
+            return certificationList;
+        }
+
+        //=========================================================================================
+    }
+}
+
+
+
+
+
+//==========================================
+using ResumeReg.DAL;
+using ResumeReg.Repository;
+using ResumeReg.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using AutoMapper.QueryableExtensions;
+using AutoMapper;
+
+
+namespace ResumeReg.Controllers
+{
+    public class ResumeCVController : Controller
+    {
+       // private IResume _repository;
+
+        private Resume _Ires = new Resume();
+
+        //public ResumeCVController(): this(new Resume())
+        //{
+
+        //}
+        //public ResumeCVController(IResume repository)
+        //{
+        //    _repository = repository;
+        //}
+        //========================================================     
+        // GET: ResumeCV
+        public ActionResult Index()
+        {
+            IEnumerable<usp_WorkExperienceVM> Result = _Ires.ExpGetAll();
+            return View(Result);
+        }
+
+        public ActionResult ADDWorkSP()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ADDWorkSP(usp_WorkExperienceVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                if (vm!=null)
+                {
+                    _Ires.ExpGetAll(vm);
+                    ViewBag.msg = "Added Successfully................";
+
+                    return RedirectToAction("Index");
+                  
+                }
+                else
+                {
+                    ViewBag.msg = "Error in code............";
+
+                }
+            }
+            return View();
+        }
+
+        public ActionResult ExpGetUpdate(int id)
+        {
+            DBCVEntities db= new DBCVEntities();
+            WorkExperience result = db.WorkExperiences.Find(id);
+             //var result =_Ires.ExpGetDetails(id);
+            return View(result);
+        }
+        [HttpPost]
+        public ActionResult ExpGetUpdate(usp_WorkExperienceVM vm)
+        {
+            if (ModelState.IsValid)
+            {
+                if (vm != null)
+                {
+                    _Ires.ExpGetUpdate(vm);
+                    ViewBag.msg = "Update Successfully................";
+
+                    return RedirectToAction("Index");
+
+                }
+                else
+                {
+                    ViewBag.msg = "Error in code............";
+
+                }
+            }
+            return View(vm);
+        }
+        
+        //===========================Add Person =====================
+
+        public ActionResult AddPerson()
+        {
+            return View();
+        }
+        [HttpPost]
+        
+        public ActionResult AddPerson(Person Pers,HttpPostedFileBase File)
+        {
+
+            if (ModelState.IsValid)
+            {
+                if (File != null)
+                {
+                    string ImageName = Path.GetFileName(File.FileName);
+                    string randomFileName = Path.GetFileNameWithoutExtension(ImageName) +
+                                        "_" + Guid.NewGuid().ToString().Substring(0, 4)
+                                            + Path.GetExtension(ImageName);
+                    string physicalPath = Server.MapPath("~/Images/");
+                    string fullpath = Path.Combine(physicalPath, randomFileName);
+                    File.SaveAs(fullpath);
+                    Pers.LinkedInProdil = randomFileName;
+
+
+                    var result = _Ires.AddPersonnalInformation(Pers, File);
+
+                    if (result !=null)
+                    {
+                        Session["IdSelected"] = Pers.IDPers;
+                        return RedirectToAction("Education");
+                    }
+                    else
+                    {
+                        ViewBag.Message = "Something Wrong !";
+                        return View(Pers);
+                    }
+                }
+            }
+         
+                    ViewBag.MessageForm = "Please Check your form before submit !";
+
+            return View(Pers);
+        }
+        //======================Education part=================================================
+        [HttpGet]
+        public ActionResult Education(EducationVM education)
+        {
+            return View();
+        }
+        
+
+        [HttpPost]
+        public ActionResult AddOrUpdateEducation(EducationVM education)
+        {
+            string msg = string.Empty;
+
+            if (education != null)
+            {
+                //Creating Mapping
+                Mapper.Initialize(cfg => cfg.CreateMap<EducationVM, Education>());
+                Education educationEntity = Mapper.Map<Education>(education);
+
+                int idPer = (int)Session["IdSelected"];
+
+               msg = _Ires.AddOrUpdateEducation(educationEntity, idPer);
+
+            }
+            else
+            {
+                msg = "Please re try the operation";
+            }
+
+            return Json(new { data = msg }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public PartialViewResult EducationPartial(EducationVM education)
+        {
+
+            education.ListOfCountry = GetCountries();
+
+            return PartialView("~/Views/Shared/_MyEducation.cshtml", education);
+        }
+
+        //=======================WorkExperience Part=================================================
+        [HttpGet]
+        public ActionResult WorkExperience()
+        {
+            return View();
+        }
+       
+        
+
+        [HttpPost]
+        public ActionResult AddOrUpdateExperience(WorkExperienceVM workExperience)
+        {
+
+            string msg = string.Empty;
+
+            if (workExperience != null)
+            {
+                //Creating Mapping
+                Mapper.Initialize(cfg => cfg.CreateMap<WorkExperienceVM, WorkExperience>());
+                WorkExperience workExperienceEntity = Mapper.Map<WorkExperience>(workExperience);
+
+                int idPer = (int)Session["IdSelected"];
+
+
+                msg = _Ires.AddOrUpdateExperience(workExperienceEntity, idPer);
+
+            }
+            else
+            {
+                msg = "Please re try the operation";
+            }
+
+            return Json(new { data = msg }, JsonRequestBehavior.AllowGet);
+        }
+
+        
+        public PartialViewResult WorkExperiencePartial(WorkExperienceVM workExperience)
+        {
+            //workExperience.ListeOfCountries = GetCountries();
+
+            return PartialView("~/Views/Shared/_WorkExperience.cshtml", workExperience);
+        }
+
+        //==========================Add Skill======================================================
+
+        [HttpGet]
+        public ActionResult SkiCerfLang()
+        {
+            return View();
+        }
+
+        public PartialViewResult SkillsPartial()
+        {
+            return PartialView("~/Views/Shared/_MySkills.cshtml");
+        }
+
+        
+        public ActionResult AddSkill(SkillsVM skill)
+        {
+            int idPer = (int)Session["IdSelected"];
+            string msg = string.Empty;
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<SkillsVM, Skill>());
+            Skill skillEntity = Mapper.Map<Skill>(skill);
+
+            if (_Ires.AddSkill(skillEntity, idPer))
+            {
+                msg = "skill added successfully";
+            }
+            else
+            {
+                msg = "something Wrong";
+            }
+
+            return Json(new { data = msg }, JsonRequestBehavior.AllowGet);
+        }
+
+        public PartialViewResult CertificationsPartial(CertificationVM certification)
+        {
+            List<SelectListItem> certificationLevel = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "Beginner", Value = "Beginner", Selected = true},
+                new SelectListItem { Text = "Intermediate", Value = "Intermediate"},
+                new SelectListItem { Text = "Advanced", Value = "Advanced"}
+            };
+
+            certification.ListOfLevel = certificationLevel;
+
+            return PartialView("~/Views/Shared/_MyCertifications.cshtml", certification);
+        }
+
+        public ActionResult AddCertification(CertificationVM certification)
+        {
+            int idPer = (int)Session["IdSelected"];
+            string msg = string.Empty;
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<CertificationVM, Certification>());
+            Certification certificationEntity = Mapper.Map<Certification>(certification);
+
+            if (_Ires.AddCertification(certificationEntity, idPer))
+            {
+                msg = "Certification added successfully";
+            }
+            else
+            {
+                msg = "something Wrong";
+            }
+
+            return Json(new { data = msg }, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public PartialViewResult LanguagePartial(LanguageVM language)
+        {
+            List<SelectListItem> languageLevel = new List<SelectListItem>()
+            {
+                new SelectListItem { Text = "Elementary Proficiency", Value = "Elementary Proficiency", Selected = true},
+                new SelectListItem { Text = "LimitedWorking Proficiency", Value = "LimitedWorking Proficiency"},
+                new SelectListItem { Text = "Professional working Proficiency", Value = "Professional working Proficiency"},
+                new SelectListItem { Text = "Full Professional Proficiency", Value = "Full Professional Proficiency"},
+                new SelectListItem { Text = "Native Or Bilingual Proficiency", Value = "Native Or Bilingual Proficiency"}
+            };
+
+            language.ListOfProficiency = languageLevel;
+
+            return PartialView("~/Views/Shared/_MyLanguage.cshtml", language);
+        }
+
+        public ActionResult AddLanguage(LanguageVM language)
+        {
+            int idPer = (int)Session["IdSelected"];
+            string msg = string.Empty;
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<LanguageVM, Language>());
+            Language languageEntity = Mapper.Map<Language>(language);
+
+            if (_Ires.AddLanguage(languageEntity, idPer))
+            {
+                msg = "Language added successfully";
+            }
+            else
+            {
+                msg = "something Wrong";
+            }
+
+            return Json(new { data = msg }, JsonRequestBehavior.AllowGet);
+        }
+
+        //=============================================================================================
+        public ActionResult CV()
+        {
+            return View();
+        }
+
+        public PartialViewResult GetPersonnalInfoPartial()
+        {
+            int idPer = (int)Session["IdSelected"];
+            Person person = _Ires.GetPersonnalInfo(idPer);
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<Person, PersonVM>());
+            PersonVM personVM = Mapper.Map<PersonVM>(person);
+
+            return PartialView("~/Views/Shared/_MyPersonnalInfo.cshtml", personVM);
+        }
+
+       
+        public PartialViewResult GetEducationCVPartial()
+        {
+            int idPer = (int)Session["IdSelected"];
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<Education, EducationVM>());
+            IQueryable<EducationVM> educationList = _Ires.GetEducationById(idPer).ProjectTo<EducationVM>().AsQueryable();
+
+            return PartialView("~/Views/Shared/_MyEducationCV.cshtml", educationList);
+        }
+
+        public PartialViewResult WorkExperienceCVPartial()
+        {
+            int idPer = (int)Session["IdSelected"];
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<WorkExperience, WorkExperienceVM>());
+            IQueryable<WorkExperienceVM> workExperienceList = _Ires.GetWorkExperienceById(idPer).ProjectTo<WorkExperienceVM>().AsQueryable();
+
+
+            return PartialView("~/Views/Shared/_WorkExperienceCV.cshtml", workExperienceList);
+        }
+
+        public PartialViewResult SkillsCVPartial()
+        {
+            int idPer = (int)Session["IdSelected"];
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<Skill, SkillsVM>());
+            IQueryable<SkillsVM> skillsList = _Ires.GetSkillsById(idPer).ProjectTo<SkillsVM>().AsQueryable();
+
+
+            return PartialView("~/Views/Shared/_MySkillsCV.cshtml", skillsList);
+        }
+        public PartialViewResult CertificationsCVPartial()
+        {
+            int idPer = (int)Session["IdSelected"];
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<Certification, CertificationVM>());
+            IQueryable<CertificationVM> certificationList = _Ires.GetCertificationsById(idPer).ProjectTo<CertificationVM>().AsQueryable();
+
+
+            return PartialView("~/Views/Shared/_MyCertificationCV.cshtml", certificationList);
+        }
+
+        public PartialViewResult LanguageCVPartial()
+        {
+            int idPer = (int)Session["IdSelected"];
+
+            //Creating Mapping
+            Mapper.Initialize(cfg => cfg.CreateMap<Language, LanguageVM>());
+            IQueryable<LanguageVM> languageList = _Ires.GetLanguageById(idPer).ProjectTo<LanguageVM>().AsQueryable();
+
+
+            return PartialView("~/Views/Shared/_MyLanguageCV.cshtml", languageList);
+        }
+        
+        //====================================================================
+
+        //=======================Country & City ==================================================
+        public ActionResult GetCities(string country)
+        {
+            List<SelectListItem> listOfCities = new List<SelectListItem>();
+
+
+            switch (country)
+            {
+                case "Morocco":
+                    listOfCities.Add(new SelectListItem() { Text = "Rabat", Value = "Rabat", Selected = true });
+                    listOfCities.Add(new SelectListItem() { Text = "Marrakech", Value = "Marrakech" });
+                    listOfCities.Add(new SelectListItem() { Text = "Tetouan", Value = "Tetouan" });
+                    break;
+
+                case "India":
+                    listOfCities.Add(new SelectListItem() { Text = "Bombay", Value = "Bombay", Selected = true });
+                    listOfCities.Add(new SelectListItem() { Text = "Bangalore", Value = "Bangalore" });
+                    listOfCities.Add(new SelectListItem() { Text = "Chennai", Value = "Chennai" });
+                    listOfCities.Add(new SelectListItem() { Text = "Hyderabad", Value = "Hyderabad" });
+                    break;
+
+                case "Spain":
+                    listOfCities.Add(new SelectListItem() { Text = "Barcelone", Value = "Barcelone", Selected = true });
+                    listOfCities.Add(new SelectListItem() { Text = "Madrid", Value = "Madrid" });
+                    listOfCities.Add(new SelectListItem() { Text = "Valence", Value = "Valence" });
+                    listOfCities.Add(new SelectListItem() { Text = "Malaga", Value = "Malaga" });
+                    break;
+
+                case "USA":
+                    listOfCities.Add(new SelectListItem() { Text = "New York", Value = "New York", Selected = true });
+                    listOfCities.Add(new SelectListItem() { Text = "Los Angeles", Value = "Los Angeles" });
+                    listOfCities.Add(new SelectListItem() { Text = "San Francisco", Value = "San Francisco" });
+                    listOfCities.Add(new SelectListItem() { Text = "Chicago", Value = "Chicago" });
+                    break;
+            }
+
+            return Json(new { data = listOfCities }, JsonRequestBehavior.AllowGet);
+        }
+        public List<SelectListItem> GetCountries()
+        {
+            List<SelectListItem> listOfCountry = new List<SelectListItem>()
+            {
+                new SelectListItem() { Text = "Morocco", Value = "Morocco", Selected = true},
+                new SelectListItem() { Text = "India", Value = "India"},
+                new SelectListItem() { Text = "Spain", Value = "Spain"},
+                new SelectListItem() { Text = "USA", Value = "USA"}
+            };
+
+            return listOfCountry;
+        }
+       //=====================================================================================
+    }
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,116 @@
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#r_UserType").change(function () {
+                
+                var selectedVal = $('option:selected', this).text();
+                if (selectedVal == "MVC") {
+                    $("#r_first , #r_second , #r_third,#FirstLabel,#SecondLabel,#ThirdLabel").show();
+                    $("#r_fourth,#FourthLabel").hide();
+                   
+                }
+                else if (selectedVal == "Sql") {
+                    $("#r_fourth , #r_second , #r_third,#FourthLabel,#SecondLabel,#ThirdLabel").show();
+
+                    $("#FirstLabel, #r_first").hide();  
+
+                }
+                else if (selectedVal == "JQUERY") {
+                    $(" #r_second , #r_third,#SecondLabel,#ThirdLabel").show();
+
+                    $("#r_first,#r_fourth,#FirstLabel,#FourthLabel").hide();
+                  
+                   }
+                else if (selectedVal == "LINQ") {
+                    $("#r_fourth,#FourthLabel").show();
+
+                    $("#r_first,#r_second,#r_third,#FirstLabel,#SecondLabel,#ThirdLabel").hide();
+
+                }
+                else {
+
+                    $("#r_first,#r_second,#r_third,#r_fourth,#FirstLabel,#SecondLabel,#ThirdLabel,#FourthLabel").hide();
+
+                }
+            });
+
+           
+
+            $("#r_first,#r_second,#r_third,#r_fourth,#FirstLabel,#SecondLabel,#ThirdLabel,#FourthLabel").hide();
+
+        });
+        $(document).ready(function () {
+            $("#r_gender").change(function () {
+                var genderval = $('input[type="radio"]:checked').val();
+                debugger
+                if (genderval == "Male") {
+                    $("#r_first , #r_second , #r_third,#FirstLabel,#SecondLabel,#ThirdLabel").show();
+                    $("#r_fourth,#FourthLabel").hide();
+
+                }
+                else if (genderval == "Female") {
+                    $("#r_first , #r_second , #r_third,#FirstLabel,#SecondLabel,#ThirdLabel").show();
+                    $("#r_fourth,#FourthLabel").hide();
+
+                }
+               
+                else {
+
+                    $("#r_first ,#FirstLabel").show();
+                    $("#r_fourth,#FourthLabel, #r_second , #r_third,#SecondLabel,#ThirdLabel").hide();
+                }
+            });
+        });
+
+        $(document).ready(function () {
+
+            $("#CountryId").change(function () {
+
+                var countryId = $(this).val();
+
+                $.ajax({
+
+                    type: "post",
+                    url: "/Forms/GetState?CountryID=" + countryId,
+                    contentType: "html",
+
+
+                    success: function (response) {
+
+
+                        $("#StateId").empty();
+                        $("#StateId").append(response);
+                    }
+                })
+
+            });
+
+            //===============City Code Here==============================
+
+            $("#StateId").change(function () {
+
+                var StateId = $(this).val();
+
+                $.ajax({
+
+                    type: "post",
+                    url: "/Forms/GetCity?StateID=" + StateId,
+                    contentType: "html",
+
+
+                    success: function (response) {
+                        debugger
+
+                        $("#CityId").empty();
+                        $("#CityId").append(response);
+                    }
+                })
+
+            })
+        });
+
+    </script>
+
+  
+-

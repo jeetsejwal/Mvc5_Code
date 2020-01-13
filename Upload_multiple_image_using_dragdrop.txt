@@ -1,0 +1,63 @@
+//=============================Multiple file upload using jquery================================
+        public ActionResult Photo()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Upload(IEnumerable<HttpPostedFileBase> files)
+        {
+            foreach (var file in files)
+            {
+                string filePath = Path.GetFileNameWithoutExtension(file.FileName) + Path.GetExtension(file.FileName);
+                file.SaveAs(Path.Combine(Server.MapPath("~/Image"), filePath));
+                //=== nuget filedrop plugin install====================================================================
+                //========Install-Package jQuery.filedrop -Version 1.0.1==========================================
+                //Area for TABLE data insert
+                PhotoUpload tbl = new PhotoUpload();
+                tbl.Name = filePath;
+                tbl.photo = Path.GetExtension(file.FileName);
+                db.PhotoUploads.Add(tbl);
+                db.SaveChanges();
+            }
+            return Json("Uploaded Successfully");
+        }
+        
+==========================================================================================================
+
+
+@{
+    ViewBag.Title = "Home Page";
+}
+<style>
+    #dropZone {
+        border: 1px dotted black;
+        text-align: center;
+    }
+</style>
+<div class="jumbotron">
+    <div id="dropZone">Drag and drop your file(s) here</div>
+    <ul class="list-group" id="uploadedFiles"></ul>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/jquery.filedrop.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#dropZone').filedrop({
+                url: '@Url.Action("Upload")',
+                allowedfiletypes: ['image/jpeg', 'image/png', 'image/gif'],
+                allowedfileextensions: ['.jpg', '.jpeg', '.png', '.gif','.JPG'],
+                paramname: 'files',
+                maxfiles: 5,
+                maxfilesize: 5, // 5 mb file maximum size
+                uploadFinished: function (i, file, response, time) {
+                    $('#uploadedfiles').append('<li class="list-group-item">' + file.name + '</li>')
+                }
+            })
+        })
+    </script>
+}
+=====================================================
+create folder image name 
+nuget filedrop plugin install
+create table for picture store

@@ -1,0 +1,23 @@
+https://github.com/SajjadArifGul/HMS/blob/master/HMS/Areas/Dashboard/Views/Shared/_Layout.cshtml
+
+HotelManegmentProject
+
+http://abctutorial.com/Post/38/ecommerce-website-design-using-bootstrap-%7C-building-an-ecommerce-website-%7C-aspnet-mvc
+
+Ecommerce Website Code....
+
+http://demo.dotnetawesome.com/mvc/advance-master-details-entry-form-in-mvc
+
+Many Scripts in this website dotNetawsome.................
+
+https://www.youtube.com/watch?v=khwgTZ_6EwU&list=PLyYDGDUwrQY1rOusI8-rxDLhMwu01MZxy
+
+Single page crud operation in mvc 5..................
+======================================================
+https://www.youtube.com/watch?v=mbr4j4YFZ_U
+(#56) Roles in MVC | Authorization in MVC | mvc tutorial for beginners in .net c# | MVC By Nitish
+
+===================================================
+https://www.connectionstrings.com/sql-server-data-types-reference/
+sql datatype
+====================================================

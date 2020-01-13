@@ -1,0 +1,9 @@
+public IEnumerable<ViewModel.usp_WorkExperienceVM> ExpGetAll()
+            {
+                //IEnumerable<ViewModel.usp_WorkExperienceVM> Result = (IEnumerable<ViewModel.usp_WorkExperienceVM>)_context.usp_WorkExperience().AsEnumerable();
+                var result = _context.Database.SqlQuery<usp_WorkExperienceVM>("usp_WorkExperience").AsEnumerable();
+
+                return result;
+            }
+====================================================
+            IEnumerable<usp_WorkExperienceVM> Result = _Ires.ExpGetAll();

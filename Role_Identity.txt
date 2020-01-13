@@ -1,0 +1,38 @@
+ 
+       Read This link Article must
+https://www.c-sharpcorner.com/article/role-based-authentication-in-asp-net-mvc/
+//=========Add  DentityModel.cs===================
+
+    public class ApplicationRole :IdentityRole
+    {
+        public ApplicationRole() : base() { }
+        public ApplicationRole(string roleName) : base(roleName) { }
+    }
+
+    //=====================================================================
+
+ //=============Add in IdentityConfig,cs=============================
+
+    public class ApplicationRoleManager : RoleManager<ApplicationRole>
+    {
+        public ApplicationRoleManager(IRoleStore<ApplicationRole, string> roleStore) : base(roleStore) { }
+         public static ApplicationRoleManager Create (IdentityFactoryOptions<ApplicationRoleManager> options,IOwinContext context)
+        {
+            var applicationRoleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole>(context.Get<ApplicationDbContext>()));
+            return applicationRoleManager;
+        }
+    }
+
+//===========================================================
+
+
+//================Add in Startup.Auth.cs===============================
+
+
+ app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create);
+
+//============================================================
+
+
+
+

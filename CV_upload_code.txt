@@ -1,0 +1,134 @@
+// OUR MODEL
+namespace MVCCarrer
+{
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    
+    public partial class Carrer
+    {
+        public int CID { get; set; }
+        [Required(ErrorMessage="Please provide fullname", AllowEmptyStrings=false)]
+        public string FullName { get; set; }
+        public string EmailID { get; set; }
+        public string CV { get; set; }
+    }
+}
+
+======================================================
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace MVCCarrer.Controllers
+{
+    public class CarrerController : Controller
+    {
+        //
+        // GET: /Carrer/
+
+        public ActionResult SubmitCV()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SubmitCV(Carrer C, HttpPostedFileBase file)
+        {
+            if (file == null)
+            {
+                ModelState.AddModelError("CustomError", "Please select CV");
+                return View();
+            }
+
+            if (!(file.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+                file.ContentType == "application/pdf"))
+            {
+                ModelState.AddModelError("CustomError", "Only .docx and .pdf file allowed");
+                return View();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                    file.SaveAs(Path.Combine(Server.MapPath("~/UploadedCV"), fileName));
+                    using (MyDatabaseEntities dc = new MyDatabaseEntities())
+                    {
+                        C.CV = fileName;
+                        dc.Carrers.Add(C);
+                        dc.SaveChanges();
+                    }
+                    ModelState.Clear();
+                    C = null;
+                    ViewBag.Message = "Successfully Done";
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = "Error! Please try again";
+                    return View();
+                }
+            }
+            return View();
+        }
+
+    }
+}
+
+=========================================================
+
+@model MVCCarrer.Carrer    //model clss name Carrer
+@{
+    ViewBag.Title = "SubmitCV";
+}
+<h2>Carrer Form</h2>
+@using (Html.BeginForm("SubmitCV", "Carrer", FormMethod.Post, new { enctype="multipart/form-data"}))
+{
+    @Html.ValidationSummary(true)
+    @Html.AntiForgeryToken() 
+    @* This AntiForgeryTokey is used for prevent CSRF Attack*@
+    <fieldset>
+        <legend>Carrer</legend>
+        @if (ViewBag.Message != null)
+        {
+            <span style="color:green">
+                @ViewBag.Message
+            </span>
+        }
+        <div class="editor-label">
+            @Html.LabelFor(model => model.FullName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.FullName)
+            @Html.ValidationMessageFor(model => model.FullName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.EmailID)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.EmailID)
+            @Html.ValidationMessageFor(model => model.EmailID)
+        </div>
+
+        <div class="editor-label">
+            Select CV
+        </div>
+        <div class="editor-field">
+            <input type="file" name="file" />
+            @Html.ValidationMessage("CustomError")
+        </div>
+        <p>
+            <input type="submit" value="Create" />
+        </p>
+    </fieldset>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+======================================================

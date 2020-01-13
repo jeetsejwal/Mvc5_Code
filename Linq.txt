@@ -1,0 +1,184 @@
+Linq is combination of c# and Sql.
+-------------------------------------
+  from s in db.user 
+  where s.salary>4000 select s.
+----------------------------------------
+ s is identifier.
+-------------------------------------
+function
+&& = AND
+|| = OR
+
+StartWith()  //string function kisse start ho rha h.
+
+Ienumerable<string> Names = from i in Names where
+                            .EndWith("a") select i
+
+Contains("sh")   // string contain krega sh.
+length           //string ki length nikalega.
+orderby          // data ko sort krne ke liye.
+  
+
+Ienumerable<student> Names= from i in stu
+                            orderby i.Name descending
+                            && i.Name.lenth>3 select i
+
+
+-----------------Aggregate Function------------------------------
+
+int[] marks={23,44,65,22,67,89};
+int s=marks.sum();          //sum of all array value
+int s1=marks.where(x=>x%2==0).sum()  //sum only even                                        number
+
+student emp=new student();  //obj of student class
+var res=emp.sum(x=>x.salary);
+var resOne=emp.Where(x=>x.name.EndWith("a")).sum(x=>x.salary);
+var resMax=emp.Max(x=>x.salary);
+var resMin=emp.Min(x=>x.salary);
+var resCount=emp.Count(x=>x.salary);   //int datatype
+var resLongCount=emp.LongCount(x=>x.salary);    //long datatype
+var resAvg=emp.Average(x=>x.salary);
+------------------------------------------------------------------
+Traverse Jagged Array
+int[][] ar=new int[];
+ar[0]={22,44,32,64,21,97}
+ar[1]={22,44,32}
+ar[2]={22,44,32,64,21,97,4,21,56}
+
+IEnerable<int> res= from p in ar
+                    From k in p
+                    where k%2==0 select k
+
+---------------------------------------------------------------------
+
+Take()  //return krega top four(agr 4 pass kiya ho) element...
+
+IEnerable<int> res=ar.Take(4)
+
+TakeWhile  // jb take condtion true h tb tk loop chalega.....
+
+
+IEnerable<int> res=ar.TakeWhile(x=>x%2==0);
+
+Skip()  //Skip krega top four(agr 4 pass kiya ho) element...
+
+Reverse()  //Sare data ko reverse kr dega.....
+
+IEnerable<int> res=ar.Reverse().skip(4)   // data ko revrse krega and value ko                                               skip kr dega
+
+SkipWhile  // jb take condtion true h tb tk loop chalega.....
+
+IEnerable<int> res=ar.SkipWhile(x=>x%2==0);
+----------------------------------------------------------------------
+
+string[] strArray = strList.ToArray<string>();    // converts List to Array
+IList<string> list = strArray.ToList<string>();  // converts array into list
+
+--------------------------------------------------------------------------
+
+Union extension method requires two collections and returns a new collection that includes distinct elements from both the collections.
+
+IList<string> strList1 = new List<string>() { "One", "Two", "three", "Four" };
+IList<string> strList2 = new List<string>() { "Two", "THREE", "Four", "Five" };
+
+var result = strList1.Union(strList2);
+
+---------------------------------------------------------------------------
+
+Empty :	Returns an empty collection
+        var emptyCollection2 = Enumerable.Empty<Student>();
+----------------------------------------------------------------------------
+Range :	Generates collection of IEnumerable<T> type with specified number of          elements with sequential values, starting from first element.
+
+var intCollection = Enumerable.Range(10, 10);
+Console.WriteLine("Total Count: {0} ", intCollection.Count());
+
+for(int i = 0; i < intCollection.Count(); i++)
+Console.WriteLine("Value at index {0} : {1}", i, intCollection.ElementAt(i));
+-----------------------------------------------------------------------------
+
+Repeat:	Generates a collection of IEnumerable<T> type with specified number of         elements and each element contains same specified value.
+
+var intCollection = Enumerable.Repeat<int>(10, 10);
+Console.WriteLine("Total Count: {0} ", intCollection.Count());
+
+for(int i = 0; i < intCollection.Count(); i++)
+ Console.WriteLine("Value at index {0} : {1}", i, intCollection.ElementAt(i));
+------------------------------------------------------------------------------
+
+DefaultIfEmpty(): method returns a new collection with the default value 
+                 if the given collection on which DefaultIfEmpty() is 
+                 invoked is empty.
+
+-----------------------------------------------------------------------------
+Single :	Returns the only element from a collection, or the only element that           satisfies a condition. If Single() found no elements or more than               oneelements in the collection then throws InvalidOperationException.
+
+SingleOrDefault :The same as Single, except that it returns a default value of                  a specified generic type, instead of throwing an exception if                  no element found for the specified condition. However, it will                  thrown InvalidOperationException if it found more than one                  element for the specified condition in the collection.
+
+Last : Returns the last element from a collection, or the last element that            satisfies a condition.
+
+LastOrDefault:Returns the last element from a collection, or the last element                 that satisfies a condition. Returns a default value if no such                  element exists.
+
+First : Returns the first element of a collection, or the first element that            satisfies a condition.
+FirstOrDefault :	Returns the first element of a collection, or the first                  element that satisfies a condition. Returns a default value if                  index is out of range.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+

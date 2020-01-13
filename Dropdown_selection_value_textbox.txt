@@ -1,0 +1,59 @@
+@model dec13_practice.DAL.CarOrder
+@{
+    ViewBag.Title = "CarOrder";
+}
+
+<h2>CarOrder</h2>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<script src="~/Scripts/jquery-1.10.2.min.js" type="text/javascript"></script>
+
+<script src="~/Scripts/jquery-1.10.2.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/CarOrders/GetData",
+            data: "{}",
+            success: function (data) {
+                var s = '<option value="-1">Please Select a Department</option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].price + '">' + data[i].carname + '</option>';
+                }
+                $("#departmentsDropdown").html(s);
+            }
+        });
+    });
+
+    function getvalue()
+    {
+        var myVal = $("#departmentsDropdown").val();
+        $("#show").val(myVal);
+    }
+</script>
+
+<form id="myForm">
+    <label for="carDropdown"><b>Car Model</b></label>
+    <select class="form-control" onchange="getvalue()" id="departmentsDropdown" name="departmentsDropdown"></select>
+    <br />
+    <input type="text" value="" id="show" class="form-control"   />
+    
+
+</form>
+
+===================================================
+
+  public ActionResult CarOrder()
+        {
+           
+            return View();
+        }
+
+        public ActionResult GetData()
+        {
+            var data = from als in db.CarOrders select new { als.carname, als.carmodel, als.price };
+            return Json(data.ToList(),JsonRequestBehavior.AllowGet);
+        }
